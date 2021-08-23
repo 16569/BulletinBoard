@@ -20,13 +20,13 @@ enum Status: String {
 }
 
 let STATUS_COLORS: Dictionary<Status, Color> = [
-    Status.UNKNOWN: Color.white,
-    Status.OWNSEAT: Color.green,
-    Status.HOLIDAY: Color.orange,
-    Status.MEETING: Color.blue,
-    Status.GOINGOUT: Color.pink,
+    Status.UNKNOWN: Color("color_def"),
+    Status.OWNSEAT: Color("color6"),
+    Status.HOLIDAY: Color("color2"),
+    Status.MEETING: Color("color11"),
+    Status.GOINGOUT: Color("color5"),
     Status.LEAVING: Color.gray,
-    Status.TELEWORK: Color.purple
+    Status.TELEWORK: Color("color10")
 ]
 
 struct UserData: Identifiable {
@@ -51,6 +51,7 @@ class UsersData: ObservableObject {
         self.userList.append(UserData(name: "ユーザー３", status: Status.LEAVING))
         self.userList.append(UserData(name: "ユーザー４", status: Status.MEETING))
         self.userList.append(UserData(name: "ユーザー５", status: Status.OWNSEAT))
+        self.userList.append(UserData(name: "ユーザー６", status: Status.TELEWORK))
     }
     
     func getUsersData() {

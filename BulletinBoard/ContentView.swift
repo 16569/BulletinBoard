@@ -17,22 +17,27 @@ struct ContentView: View {
               .edgesIgnoringSafeArea(.all)
             
             VStack{
-                Text("出社率：XX%")
+                Text("行先一覧")
 
                 LazyVGrid(columns: Array(repeating: GridItem(), count: 2)) {
                     ForEach(usersData.userList){ user in
+                        
                         ZStack {
-                            Rectangle().foregroundColor(user.color)
+                            Rectangle()
+                                .cornerRadius(20)
+                                .foregroundColor(user.color)
                                 .aspectRatio(1,contentMode: .fill)
-                                .border(Color.black)
                             VStack {
                                 Text(user.name)
+                                    .foregroundColor(.white)
                                 Text(user.status.rawValue)
+                                    .foregroundColor(.white)
                             }
                         }
-                        .padding()
+                        .padding(.all, 5)
                     }
                 }
+                .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10))
             }
         }
     }
