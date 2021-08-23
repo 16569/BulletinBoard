@@ -18,26 +18,29 @@ struct ContentView: View {
             
             VStack{
                 Text("行先一覧")
-
-                LazyVGrid(columns: Array(repeating: GridItem(), count: 2)) {
-                    ForEach(usersData.userList){ user in
-                        
-                        ZStack {
-                            Rectangle()
-                                .cornerRadius(20)
-                                .foregroundColor(user.color)
-                                .aspectRatio(1,contentMode: .fill)
-                            VStack {
-                                Text(user.name)
-                                    .foregroundColor(.white)
-                                Text(user.status.rawValue)
-                                    .foregroundColor(.white)
+                ScrollView {
+                    LazyVGrid(columns: Array(repeating: GridItem(), count: 2)) {
+                        ForEach(usersData.userList){ user in
+                            
+                            ZStack {
+                                Rectangle()
+                                    .cornerRadius(20)
+                                    .foregroundColor(user.color)
+                                    .aspectRatio(1,contentMode: .fill)
+                                VStack {
+                                    Text(user.name)
+                                        .foregroundColor(.white)
+                                    Text(user.status.rawValue)
+                                        .foregroundColor(.white)
+                                }
                             }
+                            .padding(.all, 5)
                         }
-                        .padding(.all, 5)
                     }
+                    .padding(EdgeInsets(top: 0, leading: 14, bottom: 0, trailing: 14))
+                    
+                    Spacer()
                 }
-                .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10))
             }
         }
     }
