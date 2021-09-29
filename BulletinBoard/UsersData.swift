@@ -30,6 +30,7 @@ struct UserConst {
     static let ALL_STATE = "全て"
 }
 
+/// ユーザーひとりのデータ
 struct UserData: Identifiable {
     let id = UUID()
     let name: String
@@ -69,5 +70,11 @@ class UsersData: ObservableObject {
                 return user.status.rawValue == searchWord
             }
         }
+    }
+    
+    func updateUserData(id: String) {
+        
+        // TODO: 更新処理
+        
     }
 }

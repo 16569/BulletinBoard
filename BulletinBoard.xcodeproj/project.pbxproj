@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B5CB46B2704582C00ECD28A /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B5CB46A2704582C00ECD28A /* DetailView.swift */; };
 		0B6E9EDD27030FA0003E6F64 /* DestinationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B6E9EDC27030FA0003E6F64 /* DestinationList.swift */; };
 		0B8A07CF26D155F1001B6749 /* BulletinBoardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8A07CE26D155F1001B6749 /* BulletinBoardApp.swift */; };
 		0B8A07D126D155F1001B6749 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B8A07D026D155F1001B6749 /* ContentView.swift */; };
@@ -29,6 +30,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0B5CB46A2704582C00ECD28A /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		0B6E9EDC27030FA0003E6F64 /* DestinationList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationList.swift; sourceTree = "<group>"; };
 		0B8A07CB26D155F1001B6749 /* BulletinBoard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BulletinBoard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B8A07CE26D155F1001B6749 /* BulletinBoardApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulletinBoardApp.swift; sourceTree = "<group>"; };
@@ -73,6 +75,7 @@
 				0B8A07D026D155F1001B6749 /* ContentView.swift */,
 				0B6E9EDC27030FA0003E6F64 /* DestinationList.swift */,
 				0B8A07E326D15E62001B6749 /* UsersData.swift */,
+				0B5CB46A2704582C00ECD28A /* DetailView.swift */,
 				0B8A07D226D155F5001B6749 /* Assets.xcassets */,
 				0B8A07D726D155F5001B6749 /* Info.plist */,
 				0B8A07D426D155F5001B6749 /* Preview Content */,
@@ -161,6 +164,7 @@
 				0B8A07D126D155F1001B6749 /* ContentView.swift in Sources */,
 				0B8A07E426D15E62001B6749 /* UsersData.swift in Sources */,
 				0B6E9EDD27030FA0003E6F64 /* DestinationList.swift in Sources */,
+				0B5CB46B2704582C00ECD28A /* DetailView.swift in Sources */,
 				0B8A07CF26D155F1001B6749 /* BulletinBoardApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
