@@ -2,59 +2,72 @@
 //  UserData.swift
 //  BulletinBoard
 //
-//  Created by 藤浦　道 on 2021/08/22.
-//
 
 import Foundation
 import SwiftUI
 
+struct UserConst {
+    enum DestState: String, CaseIterable {
+        case UNKNOWN = "未指定"
+        case OWNSEAT = "自席"
+        case HOLIDAY = "休暇"
+        case MEETING = "会議中"
+        case GOINGOUT = "外出中"
+        case LEAVING = "退勤"
+        case TELEWORK = "テレワーク"
+    }
 
-enum Status: String {
-    case UNKNOWN = "不明"
-    case OWNSEAT = "自席"
-    case HOLIDAY = "休暇"
-    case MEETING = "会議中"
-    case GOINGOUT = "外出中"
-    case LEAVING = "退勤"
-    case TELEWORK = "テレワーク"
+    static let DEST_COLORS: Dictionary<DestState, Color> = [
+        DestState.UNKNOWN: Color("color_def"),
+        DestState.OWNSEAT: Color("color6"),
+        DestState.HOLIDAY: Color("color2"),
+        DestState.MEETING: Color("color11"),
+        DestState.GOINGOUT: Color("color5"),
+        DestState.LEAVING: Color.gray,
+        DestState.TELEWORK: Color("color10")
+    ]
+
+    static let ALL_STATE = "全て"
 }
-
-let STATUS_COLORS: Dictionary<Status, Color> = [
-    Status.UNKNOWN: Color("color_def"),
-    Status.OWNSEAT: Color("color6"),
-    Status.HOLIDAY: Color("color2"),
-    Status.MEETING: Color("color11"),
-    Status.GOINGOUT: Color("color5"),
-    Status.LEAVING: Color.gray,
-    Status.TELEWORK: Color("color10")
-]
 
 struct UserData: Identifiable {
     let id = UUID()
     let name: String
-    var status: Status
+    var status: UserConst.DestState
     var color: Color = Color.white
-    init(name: String, status: Status){
+    init(name: String, status: UserConst.DestState){
         self.name = name
         self.status = status
-        self.color = STATUS_COLORS[self.status] ?? Color.white
+        self.color = UserConst.DEST_COLORS[self.status] ?? Color("color_def")
     }
 }
 
 class UsersData: ObservableObject {
-    @Published var userList: [UserData] = []
+    @Published var showUserList: [UserData] = []
+    var searchedUserList: [UserData] = []
     
     // テストデータ作成用
     init(){
-        self.userList.append(UserData(name: "ユーザー１", status: Status.GOINGOUT))
-        self.userList.append(UserData(name: "ユーザー２", status: Status.HOLIDAY))
-        self.userList.append(UserData(name: "ユーザー３", status: Status.LEAVING))
-        self.userList.append(UserData(name: "ユーザー４", status: Status.MEETING))
-        self.userList.append(UserData(name: "ユーザー５", status: Status.OWNSEAT))
-        self.userList.append(UserData(name: "ユーザー６", status: Status.TELEWORK))
+        self.searchedUserList.append(UserData(name: "ユーザー１", status: UserConst.DestState.GOINGOUT))
+        self.searchedUserList.append(UserData(name: "ユーザー２", status: UserConst.DestState.HOLIDAY))
+        self.searchedUserList.append(UserData(name: "ユーザー３", status: UserConst.DestState.LEAVING))
+        self.searchedUserList.append(UserData(name: "ユーザー４", status: UserConst.DestState.MEETING))
+        self.searchedUserList.append(UserData(name: "ユーザー５", status: UserConst.DestState.OWNSEAT))
+        self.searchedUserList.append(UserData(name: "ユーザー６", status: UserConst.DestState.TELEWORK))
+        
+        self.showUserList = self.searchedUserList
     }
-    
-    func getUsersData() {
 
+    func searchUsersData(searchWord: String) {
+        
+        // TODO: 取得処理
+        
+        if searchWord == UserConst.ALL_STATE {
+            self.showUserList = self.searchedUserList
+        } else {
+            self.showUserList = self.searchedUserList.filter { user in
+                return user.status.rawValue == searchWord
+            }
+        }
     }
 }
