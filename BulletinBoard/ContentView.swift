@@ -6,12 +6,18 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @AppStorage("first_time") var firstTime: Bool = true
+    @AppStorage("emp_no") var myEnpNo: String = ""
 
     var body: some View {
         
         // TODO: 状態に応じて画面分岐
-        
-        DestinationList()
+        if firstTime {
+            FirstTimeView()
+        } else {
+            DestinationList()
+        }
     }
 
 }
