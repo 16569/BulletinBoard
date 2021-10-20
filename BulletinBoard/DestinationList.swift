@@ -21,14 +21,17 @@ struct DestinationList: View {
             initWords.append(destState.rawValue)
         }
         _searchWordArray = State(initialValue: initWords)
+        
     }
     
     var body: some View {
+
         ZStack{
             Color("color_back")
               .edgesIgnoringSafeArea(.all)
 
             VStack{
+
                 Text("行先一覧")
                 Menu{
                     ForEach(searchWordArray, id: \.self){ index in
@@ -47,27 +50,34 @@ struct DestinationList: View {
                    }
 
                 ScrollView {
-                    // TODO: 要素の数を画面サイズなどに合わせて変えたい
-                    LazyVGrid(columns: Array(repeating: GridItem(), count: 2)) {
+
+                    LazyVGrid(columns: Array(repeating: GridItem(), count: Int(UIScreen.main.bounds.width) / 160)) {
                         ForEach(usersData.showUserList){ user in
 
                             ZStack {
                                 
                                 Rectangle()
                                     .cornerRadius(20)
-                                    .foregroundColor(user.color)
+                                    .foregroundColor(UserConst.DEST_COLORS[user.status] ?? Color("color_back"))
                                     .aspectRatio(1,contentMode: .fill)
                                     .onTapGesture {
                                         self.showDetail = true
                                     }
                                 
                                 // TODO: イメージ画像をステータスごとに入れる
-                                
+                                Image(systemName: "person.icloud")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .aspectRatio(1,contentMode: .fit)
+                                    .foregroundColor(.white)
+    
                                 VStack {
                                     Text(user.name)
                                         .foregroundColor(Color("color_def"))
+                                        .font(.title2)
                                     Text(user.status.rawValue)
                                         .foregroundColor(Color("color_def"))
+                                        .font(.title2)
                                 }
                                 
                             }
@@ -84,6 +94,8 @@ struct DestinationList: View {
                 DetailView(isPresent: $showDetail, empNo: "23908")  // NOTE: 社員番号は適当
             }
         }
+        .navigationBarBackButtonHidden(true)
+        .navigationBarHidden(true)
     }
 }
 

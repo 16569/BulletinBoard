@@ -5,6 +5,7 @@
 
 import Foundation
 import SwiftUI
+import Firebase
 
 struct UserConst {
     enum DestState: String, CaseIterable {
@@ -18,7 +19,7 @@ struct UserConst {
     }
 
     static let DEST_COLORS: Dictionary<DestState, Color> = [
-        DestState.UNKNOWN: Color("color_def"),
+        DestState.UNKNOWN: Color("color_back"),
         DestState.OWNSEAT: Color("color6"),
         DestState.HOLIDAY: Color("color2"),
         DestState.MEETING: Color("color11"),
@@ -34,12 +35,10 @@ struct UserConst {
 struct UserData: Identifiable {
     let id = UUID()
     let name: String
-    var status: UserConst.DestState
-    var color: Color = Color.white
+    var status: UserConst.DestState // TODO: string
     init(name: String, status: UserConst.DestState){
         self.name = name
         self.status = status
-        self.color = UserConst.DEST_COLORS[self.status] ?? Color("color_def")
     }
 }
 
@@ -49,32 +48,105 @@ class UsersData: ObservableObject {
     
     // テストデータ作成用
     init(){
-        self.searchedUserList.append(UserData(name: "ユーザー１", status: UserConst.DestState.GOINGOUT))
-        self.searchedUserList.append(UserData(name: "ユーザー２", status: UserConst.DestState.HOLIDAY))
-        self.searchedUserList.append(UserData(name: "ユーザー３", status: UserConst.DestState.LEAVING))
-        self.searchedUserList.append(UserData(name: "ユーザー４", status: UserConst.DestState.MEETING))
-        self.searchedUserList.append(UserData(name: "ユーザー５", status: UserConst.DestState.OWNSEAT))
-        self.searchedUserList.append(UserData(name: "ユーザー６", status: UserConst.DestState.TELEWORK))
+//        self.searchedUserList.append(UserData(name: "ユーザー１", status: UserConst.DestState.GOINGOUT))
+//        self.searchedUserList.append(UserData(name: "ユーザー２", status: UserConst.DestState.HOLIDAY))
+//        self.searchedUserList.append(UserData(name: "ユーザー３", status: UserConst.DestState.LEAVING))
+//        self.searchedUserList.append(UserData(name: "ユーザー４", status: UserConst.DestState.MEETING))
+//        self.searchedUserList.append(UserData(name: "ユーザー５", status: UserConst.DestState.OWNSEAT))
+//        self.searchedUserList.append(UserData(name: "ユーザー６", status: UserConst.DestState.TELEWORK))
+//        self.showUserList = self.searchedUserList
         
-        self.showUserList = self.searchedUserList
+        if FirebaseApp.app() == nil {
+            FirebaseApp.configure()
+        }
+
+        let db = Firestore.firestore()
+        let collection = db.collection("user")
+        collection.getDocuments { _snapshot, _error in
+            if let error = _error {
+                print(error)
+                return
+            }
+
+            self.searchedUserList = []
+
+            _snapshot!.documents.forEach { doc in
+                let data = doc.data()
+                print(doc.documentID)
+                print(data)
+
+                self.searchedUserList.append(
+                    UserData(name: data["name"] as! String,
+                        status: UserConst.DestState.init(rawValue: data["destination"] as! String) ?? UserConst.DestState.UNKNOWN))
+            }
+
+            self.showUserList = self.searchedUserList
+        }
     }
 
     func searchUsersData(searchWord: String) {
         
-        // TODO: 取得処理
+//                    if searchWord == UserConst.ALL_STATE {
+//                        self.showUserList = self.searchedUserList
+//                    } else {
+//                        self.showUserList = self.searchedUserList.filter { user in
+//                            return user.status.rawValue == searchWord
+//                        }
+//                    }
         
-        if searchWord == UserConst.ALL_STATE {
-            self.showUserList = self.searchedUserList
-        } else {
-            self.showUserList = self.searchedUserList.filter { user in
-                return user.status.rawValue == searchWord
+        let db = Firestore.firestore()
+        let collection = db.collection("user")
+        collection.getDocuments { _snapshot, _error in
+            if let error = _error {
+                print(error)
+                return
+            }
+
+            self.searchedUserList = []
+
+            _snapshot!.documents.forEach { doc in
+                let data = doc.data()
+                print(doc.documentID)
+                print(data)
+
+                self.searchedUserList.append(
+                    UserData(name: data["name"] as! String,
+                        status: UserConst.DestState.init(rawValue: data["destination"] as! String) ?? UserConst.DestState.UNKNOWN))
+            }
+
+            if searchWord == UserConst.ALL_STATE {
+                self.showUserList = self.searchedUserList
+            } else {
+                self.showUserList = self.searchedUserList.filter { user in
+                    return user.status.rawValue == searchWord
+                }
             }
         }
     }
     
-    func updateUserData(id: String) {
+    func updateUserData(empNo: String) {
         
         // TODO: 更新処理
+        let db = Firestore.firestore()
+        let collection = db.collection("user")
         
+        collection.getDocuments { snapshot, error in
+            if let error = error {
+                print(error)
+                return
+            }
+            
+            snapshot!.documents.forEach { doc in
+                let data = doc.data()
+                print(doc.documentID)
+                print(data)
+                let target = data["emp_no"] as? String
+                
+                if empNo == target {
+                    
+                }
+            }
+            
+        }
     }
 }
