@@ -90,8 +90,9 @@ struct DestinationList: View {
                     
                 }
             }
+            .modifier(BlurModifierSimple(showOverlay: $showDetail))
             if self.showDetail {
-                DetailView(isPresent: $showDetail, empNo: "23908")  // NOTE: 社員番号は適当
+                DetailView(isPresent: $showDetail, empNo: "23908", stateArray: searchWordArray)  // NOTE: 社員番号は適当
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -102,5 +103,20 @@ struct DestinationList: View {
 struct DestinationList_Previews: PreviewProvider {
     static var previews: some View {
         DestinationList()
+    }
+}
+
+/// 背景ぼかし用
+struct BlurModifierSimple: ViewModifier {
+    @Binding var showOverlay: Bool
+    @State var blurRadius: CGFloat = 10
+    
+    func body(content: Content) -> some View {
+        Group {
+            content
+                .blur(radius: showOverlay ? blurRadius : 0)
+                .animation(.easeInOut)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
