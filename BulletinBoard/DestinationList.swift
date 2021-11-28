@@ -8,11 +8,15 @@ import SwiftUI
 /// 行先一覧画面
 struct DestinationList: View {
 
+    @AppStorage("emp_no") var myEmpNo: String = ""
+    
     @ObservedObject var usersData = UsersData()
     
     @State var searchWord = UserConst.ALL_STATE
     @State var searchWordArray : [String] = []
     @State var showDetail = false
+    @State var selectedUser: UserData = UserConst.dumyUser
+    @State var isMine: Bool = false
 
     init(){
         var initWords: [String] = []
@@ -22,6 +26,7 @@ struct DestinationList: View {
         }
         _searchWordArray = State(initialValue: initWords)
         
+        usersData.searchUsersData(searchWord: UserConst.ALL_STATE)
     }
     
     var body: some View {
@@ -58,24 +63,29 @@ struct DestinationList: View {
                                 
                                 Rectangle()
                                     .cornerRadius(20)
-                                    .foregroundColor(UserConst.DEST_COLORS[user.status] ?? Color("color_back"))
+                                    .foregroundColor(UserConst.DEST_COLORS[user.status])
                                     .aspectRatio(1,contentMode: .fill)
                                     .onTapGesture {
                                         self.showDetail = true
+                                        self.selectedUser = user
+                                        self.isMine = self.myEmpNo == user.empNo
                                     }
                                 
-                                // TODO: イメージ画像をステータスごとに入れる
-                                Image(systemName: "person.icloud")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .aspectRatio(1,contentMode: .fit)
-                                    .foregroundColor(.white)
+
     
                                 VStack {
+                                    
+                                    // TODO: イメージ画像をステータスごとに入れる
+                                    Image(systemName: "person.icloud")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .aspectRatio(1,contentMode: .fit)
+                                        .foregroundColor(.white)
+                                    
                                     Text(user.name)
                                         .foregroundColor(Color("color_def"))
                                         .font(.title2)
-                                    Text(user.status.rawValue)
+                                    Text(user.status)
                                         .foregroundColor(Color("color_def"))
                                         .font(.title2)
                                 }
@@ -92,7 +102,10 @@ struct DestinationList: View {
             }
             .modifier(BlurModifierSimple(showOverlay: $showDetail))
             if self.showDetail {
-                DetailView(isPresent: $showDetail, empNo: "23908", stateArray: searchWordArray)  // NOTE: 社員番号は適当
+                DetailView(isPresent: self.$showDetail, user: self.selectedUser, isMine: self.isMine)
+                    .onDisappear{
+                        self.usersData.searchUsersData(searchWord: self.searchWord)
+                    }
             }
         }
         .navigationBarBackButtonHidden(true)

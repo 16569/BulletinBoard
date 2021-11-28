@@ -80,7 +80,7 @@ struct UserSettingView: View {
     
     @State var empNo: String = ""
     @State var name: String = ""
-    
+
     @State var opacity: Double = 0
     
     var isDisable: Bool {
@@ -153,6 +153,12 @@ struct UserSettingView: View {
                 }
                 .onTapGesture {
                     viewState = ViewState.Status
+                    
+                    // DBインサート
+                    let usersData = UsersData()
+                    usersData.updateUserData(user: UserData(empNo: empNo, name: name, status: UserConst.DestState.UNKNOWN.rawValue, comment: ""))
+                    
+                    // 静的ストレージ保存
                     firstTime = false
                     myName = name
                     myEmpNo = empNo
@@ -178,11 +184,13 @@ struct StatusView : View {
     
     @Binding var viewState: ViewState
     
-    @State var name: String = ""
+    @AppStorage("emp_no") var myEmpNo: String = ""
+    
     @State var opacity: Double = 0
     
     @State var state = UserConst.DestState.UNKNOWN.rawValue
     @State var stateArray : [String] = []
+    @State var showAlert = false
 
     init(viewState: Binding<ViewState>){
         var initWords: [String] = []
@@ -217,7 +225,7 @@ struct StatusView : View {
             .frame(width: UIScreen.main.bounds.width / 2, height: 48, alignment: .center)
             .frame(minWidth: 200)
             //.foregroundColor(Color("color_def"))
-            .background(UserConst.DEST_COLORS[UserConst.DestState.init(rawValue: self.state) ?? UserConst.DestState.UNKNOWN] ?? Color("color_back"))
+            .background(UserConst.DEST_COLORS[self.state] ?? Color("color_back"))
             .border(Color("color_def"))
             
             Text("行先一覧へ")
@@ -227,7 +235,21 @@ struct StatusView : View {
                 .background(Color("color11"))
                 .cornerRadius(24)
                 .onTapGesture {
-                    viewState = ViewState.Next
+                    // DB更新
+                    let usersData = UsersData()
+                    let user = usersData.getUserData(empNo: myEmpNo)
+                    
+                    if var editUser = user {
+                        editUser.status = self.state
+                        usersData.updateUserData(user: editUser)
+                        viewState = ViewState.Next
+                    } else {
+                        showAlert = true
+                    }
+                    
+                }
+                .alert(isPresented: $showAlert) {
+                    Alert(title: Text("例外エラー"), message: Text("予期せぬエラーです。ネットワークの設定をご確認ください。"), dismissButton: .default(Text("OK")))
                 }
                 .padding()
             

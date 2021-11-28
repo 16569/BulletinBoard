@@ -10,13 +10,34 @@ struct DetailView: View {
     
     @Binding var isPresent: Bool
     
-    @State var empNo: String
-    @State var name: String = ""
-    @State var comment: String = ""
+    @State var user: UserData
+    @State var isMine: Bool
     
-    @State var state = UserConst.ALL_STATE
+    @State var empNo: String
+    @State var name: String
+    @State var comment: String
+    
+    @State var state: String
     @State var stateArray : [String] = []
 
+    init(isPresent: Binding<Bool>, user: UserData, isMine: Bool){
+        self._isPresent = isPresent
+        self._user = State(initialValue: user)
+        self._isMine = State(initialValue: isMine)
+        
+        var initWords: [String] = []
+        initWords.append(UserConst.ALL_STATE)
+        for destState in UserConst.DestState.allCases {
+            initWords.append(destState.rawValue)
+        }
+        self._stateArray = State(initialValue: initWords)
+        
+        self._name = State(initialValue: user.name)
+        self._empNo = State(initialValue: user.empNo)
+        self._comment = State(initialValue: user.comment)
+        self._state = State(initialValue: user.status)
+    }
+    
     var body: some View {
         ZStack {
             Rectangle()
@@ -57,6 +78,7 @@ struct DetailView: View {
                     .cornerRadius(24)
                     .font(.title2)
                     .frame(width: UIScreen.main.bounds.width / 1.3, height: 48, alignment: .leading)
+                    .disabled(!self.isMine)
                 }
                 
                 // 行先エリア
@@ -79,9 +101,9 @@ struct DetailView: View {
                        }
                     .font(.title2)
                     .frame(width: UIScreen.main.bounds.width / 1.3, height: 48, alignment: .leading)
-                    .background(UserConst.DEST_COLORS[UserConst.DestState.init(rawValue: self.state) ??
-                                                      UserConst.DestState.UNKNOWN] ?? Color("color_back"))
+                    .background(UserConst.DEST_COLORS[self.state])
                     .border(Color("color_def"))
+                    .disabled(!self.isMine)
                 }
                 
                 // コメントエリア
@@ -95,6 +117,7 @@ struct DetailView: View {
                     .border(Color("color_def"))
                     .font(.title2)
                     .frame(width: UIScreen.main.bounds.width / 1.3, height: 150, alignment: .center)
+                    .disabled(!self.isMine)
                 }
                 
                 Text("完了")
@@ -107,6 +130,13 @@ struct DetailView: View {
                     }
                     .onTapGesture {
                         withAnimation {
+                            if self.isMine {
+                                let usersData = UsersData()
+                                self.user.status = self.state
+                                self.user.comment = self.comment
+                                self.user.name = self.name
+                                usersData.updateUserData(user: self.user)
+                            }
                             isPresent = false
                         }
                     }
