@@ -29,6 +29,7 @@ struct DestinationList: View {
         usersData.searchUsersData(searchWord: UserConst.ALL_STATE)
     }
     
+    
     var body: some View {
 
         ZStack{
@@ -55,33 +56,58 @@ struct DestinationList: View {
                    }
 
                 ScrollView {
-
+                
                     LazyVGrid(columns: Array(repeating: GridItem(), count: Int(UIScreen.main.bounds.width) / 160)) {
                         ForEach(usersData.showUserList){ user in
-
-                            ZStack {
-                                
+                            ZStack{
                                 Rectangle()
                                     .cornerRadius(20)
                                     .foregroundColor(UserConst.DEST_COLORS[user.status])
-                                    .aspectRatio(1,contentMode: .fill)
                                     .onTapGesture {
                                         self.showDetail = true
                                         self.selectedUser = user
                                         self.isMine = self.myEmpNo == user.empNo
                                     }
                                 
-
-    
                                 VStack {
-                                    
-                                    // TODO: イメージ画像をステータスごとに入れる
-                                    Image(systemName: "person.icloud")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .aspectRatio(1,contentMode: .fit)
-                                        .foregroundColor(.white)
-                                    
+                                    switch user.status {
+                                    case UserConst.DestState.UNKNOWN.rawValue:
+                                        Image("未指定")
+                                            .resizable()
+                                            .scaledToFit()
+                                    case UserConst.DestState.GOINGOUT.rawValue:
+                                        Image("外出")
+                                            .resizable()
+                                            .scaledToFit()
+                                    case UserConst.DestState.LEAVING.rawValue:
+                                        Image("退勤")
+                                            .resizable()
+                                            .scaledToFit()
+                                    case UserConst.DestState.HOLIDAY.rawValue:
+                                        Image("休暇")
+                                            .resizable()
+                                            .scaledToFit()
+                                    case UserConst.DestState.MEETING.rawValue:
+                                        Image("会議")
+                                            .resizable()
+                                            .scaledToFit()
+                                    case UserConst.DestState.OWNSEAT.rawValue:
+                                        Image("自席")
+                                            .resizable()
+                                            .scaledToFit()
+                                    case UserConst.DestState.TELEWORK.rawValue:
+                                        Image("テレワーク")
+                                            .resizable()
+                                            .scaledToFit()
+                                    default:
+                                        Image(systemName: "person.icloud")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .aspectRatio(1,contentMode: .fit)
+                                            .foregroundColor(.white)
+                                    }
+                  
+
                                     Text(user.name)
                                         .foregroundColor(Color("color_def"))
                                         .font(.title2)
@@ -89,13 +115,14 @@ struct DestinationList: View {
                                         .foregroundColor(Color("color_def"))
                                         .font(.title2)
                                 }
-                                
+                                .padding(.all, 10)
                             }
-                            .padding(.all, 5)
+                            .frame(width: 160, height: 160)
+                            
                         }
                     }
                     .padding(EdgeInsets(top: 0, leading: 14, bottom: 0, trailing: 14))
-
+                    
                     Spacer()
                     
                 }
