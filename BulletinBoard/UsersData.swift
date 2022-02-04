@@ -19,7 +19,7 @@ struct UserConst {
     }
 
     static let DEST_COLORS: Dictionary<String, Color> = [
-        DestState.UNKNOWN.rawValue: Color("color_back"),
+        DestState.UNKNOWN.rawValue: Color("color13"),
         DestState.OWNSEAT.rawValue: Color("color6"),
         DestState.HOLIDAY.rawValue: Color("color2"),
         DestState.MEETING.rawValue: Color("color11"),
@@ -60,6 +60,9 @@ struct UserData: Identifiable {
 }
 
 class UsersData: ObservableObject {
+    
+    @AppStorage("emp_no") var myEmpNo: String = ""
+    
     @Published var showUserList: [UserData] = []
     var searchedUserList: [UserData] = []
     
@@ -98,23 +101,63 @@ class UsersData: ObservableObject {
                     return user.status == searchWord
                 }
             }
+            self.showUserList = self.showUserList.sorted { user1, user2 in
+                user1.empNo > user2.empNo
+            }
+            
+            var idx: Int = 0
+            var tmp: UserData?
+            for u in self.showUserList {
+                if u.empNo == self.myEmpNo {
+                    tmp = u
+                    break
+                }
+                idx += 1
+            }
+            self.showUserList.remove(at: idx)
+            if let ins = tmp {
+                self.showUserList.insert(ins, at: 0)
+            }
         }
         
     }
     
     func getUserData(empNo: String) -> Optional<UserData> {
+ 
+        // NOTE: なんか同期出来てないっぽい
         
         let db = Firestore.firestore()
         let collection = db.collection("user")
-        var user: UserData = UserConst.dumyUser
-        collection.document(empNo).getDocument { (snap, error) in
-            if let error = error {
-                fatalError("\(error)")
+        var result: UserData? = nil//UserConst.dumyUser
+        let ref = collection.document(empNo)
+        
+        let semaphore = DispatchSemaphore(value: 0)
+        ref.getDocument { (snap, error) in
+            if let e = error {
+                //fatalError("\(e)")
+                semaphore.signal()
+                print("\(e)")
+                
+                return
             }
-            guard let data = snap?.data() else { return }
-            user = self.parthUserData(empNo: empNo, data: data)!
+            guard let data = snap?.data() else {
+                semaphore.signal()
+                return
+            }
+            result = self.parthUserData(empNo: empNo, data: data)!
+            semaphore.signal()
         }
-        return user
+        
+        switch semaphore.wait(timeout: .now() + 10.0) {
+        case .success:
+            print("got user")
+            break
+        case .timedOut:
+            print("time out")
+            break
+        }
+        
+        return result
         
     }
     

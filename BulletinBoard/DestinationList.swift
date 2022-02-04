@@ -15,7 +15,7 @@ struct DestinationList: View {
     @State var searchWord = UserConst.ALL_STATE
     @State var searchWordArray : [String] = []
     @State var showDetail = false
-    @State var selectedUser: UserData = UserConst.dumyUser
+    @State var selectedUser: UserData? = nil//UserConst.dumyUser
     @State var isMine: Bool = false
 
     init(){
@@ -39,6 +39,7 @@ struct DestinationList: View {
             VStack{
 
                 Text("行先一覧")
+                    .font(SwiftUI.Font.title)
                 Menu{
                     ForEach(searchWordArray, id: \.self){ index in
                         Button(action: {
@@ -129,10 +130,12 @@ struct DestinationList: View {
             }
             .modifier(BlurModifierSimple(showOverlay: $showDetail))
             if self.showDetail {
-                DetailView(isPresent: self.$showDetail, user: self.selectedUser, isMine: self.isMine)
+                if let suser = self.selectedUser {
+                DetailView(isPresent: self.$showDetail, user: suser, isMine: self.isMine)
                     .onDisappear{
                         self.usersData.searchUsersData(searchWord: self.searchWord)
                     }
+                }
             }
         }
         .navigationBarBackButtonHidden(true)

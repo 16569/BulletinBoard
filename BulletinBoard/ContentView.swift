@@ -12,7 +12,6 @@ struct ContentView: View {
 
     var body: some View {
         
-        // TODO: 状態に応じて画面分岐
         if firstTime {
             FirstTimeView()
         } else {

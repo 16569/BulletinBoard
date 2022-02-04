@@ -16,16 +16,19 @@ struct FirstTimeView: View {
     
     @State var viewState: ViewState = ViewState.Greeting
     
+    @State var user: UserData?
+    
     var body: some View {
         
         switch self.viewState {
         case .Greeting:
             GreetingView(viewState: $viewState)
         case .Setting:
-            UserSettingView(viewState: $viewState)
+            UserSettingView(viewState: $viewState, user: $user)
         case .Status:
-            StatusView(viewState: $viewState)
+            StatusView(viewState: $viewState, user: $user)
         case .Next:
+            // （多分ここには入らない）
             DestinationList()
         }
         
@@ -74,7 +77,6 @@ struct UserSettingView: View {
     
     @Binding var viewState: ViewState
     
-    @AppStorage("first_time") var firstTime: Bool = true
     @AppStorage("emp_no") var myEmpNo: String = ""
     @AppStorage("name") var myName: String = ""
     
@@ -82,6 +84,8 @@ struct UserSettingView: View {
     @State var name: String = ""
 
     @State var opacity: Double = 0
+    
+    @Binding var user: UserData?
     
     var isDisable: Bool {
         empNo.isEmpty || name.isEmpty
@@ -91,7 +95,7 @@ struct UserSettingView: View {
         
         VStack{
             
-            Text("社員番号と名前を入力してください。この設定は後から変更出来ます。")
+            Text("社員番号と名前を入力してください。")
                 .padding()
             
             HStack {
@@ -156,10 +160,10 @@ struct UserSettingView: View {
                     
                     // DBインサート
                     let usersData = UsersData()
-                    usersData.updateUserData(user: UserData(empNo: empNo, name: name, status: UserConst.DestState.UNKNOWN.rawValue, comment: ""))
+                    self.user = UserData(empNo: empNo, name: name, status: UserConst.DestState.UNKNOWN.rawValue, comment: "")
+                    usersData.updateUserData(user: self.user!)
                     
                     // 静的ストレージ保存
-                    firstTime = false
                     myName = name
                     myEmpNo = empNo
                 }
@@ -174,7 +178,9 @@ struct UserSettingView: View {
             }
         }
         .onDisappear {
-            self.opacity = 0.0
+            withAnimation(.linear(duration: 1.5)) {
+                self.opacity = 0.0
+            }
         }
     }
     
@@ -182,6 +188,7 @@ struct UserSettingView: View {
 
 struct StatusView : View {
     
+    @AppStorage("first_time") var firstTime: Bool = true
     @Binding var viewState: ViewState
     
     @AppStorage("emp_no") var myEmpNo: String = ""
@@ -191,14 +198,17 @@ struct StatusView : View {
     @State var state = UserConst.DestState.UNKNOWN.rawValue
     @State var stateArray : [String] = []
     @State var showAlert = false
+    
+    @Binding var user: UserData?
 
-    init(viewState: Binding<ViewState>){
+    init(viewState: Binding<ViewState>, user: Binding<UserData?>){
         var initWords: [String] = []
         for destState in UserConst.DestState.allCases {
             initWords.append(destState.rawValue)
         }
         _stateArray = State(initialValue: initWords)
         _viewState = viewState
+        _user = user
     }
     
     var body: some View {
@@ -224,7 +234,6 @@ struct StatusView : View {
                }
             .frame(width: UIScreen.main.bounds.width / 2, height: 48, alignment: .center)
             .frame(minWidth: 200)
-            //.foregroundColor(Color("color_def"))
             .background(UserConst.DEST_COLORS[self.state] ?? Color("color_back"))
             .border(Color("color_def"))
             
@@ -233,17 +242,19 @@ struct StatusView : View {
                 .frame(minWidth: 160)
                 .foregroundColor(Color("color_def"))
                 .background(Color("color11"))
+                .opacity(self.state == UserConst.DestState.UNKNOWN.rawValue ? 0.25 : 1)
                 .cornerRadius(24)
                 .onTapGesture {
                     // DB更新
-                    let usersData = UsersData()
-                    let user = usersData.getUserData(empNo: myEmpNo)
-                    
-                    if var editUser = user {
-                        editUser.status = self.state
-                        usersData.updateUserData(user: editUser)
+                    do {
+                        let usersData = UsersData()
+                        //let user = usersData.getUserData(empNo: myEmpNo)
+                       
+                        self.user!.status = self.state
+                        usersData.updateUserData(user: self.user!)
                         viewState = ViewState.Next
-                    } else {
+                        firstTime = false
+                    } catch {
                         showAlert = true
                     }
                     
@@ -251,6 +262,7 @@ struct StatusView : View {
                 .alert(isPresented: $showAlert) {
                     Alert(title: Text("例外エラー"), message: Text("予期せぬエラーです。ネットワークの設定をご確認ください。"), dismissButton: .default(Text("OK")))
                 }
+                .disabled(self.state == UserConst.DestState.UNKNOWN.rawValue)
                 .padding()
             
         }
